@@ -9,10 +9,18 @@ const multer = require('multer');
 const fs = require('fs');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const cors = require("cors");
-app.use(cors());
+
+// Configure middleware
+app.use(cors({
+  origin: 'http://localhost:3000', // Allow requests from your frontend
+  methods: ['GET', 'POST'],        // Allow specific methods
+  credentials: true                // Allow credentials
+}));
+app.use(express.json()); // Parse JSON bodies
+app.use(express.static(path.join(__dirname, "public")));
 
 // Command queue per user+device
-const commandQueue = {}; // Format: { "ritwik:esp32": { command: "LED_ON" } }
+const commandQueue = {}; // Format: { "ritwik:esp32": { commands: ["LED_ON", "DOOR_OPEN"] } }
 
 // POST /command - client UI sends commands here
 app.post("/command", (req, res) => {
@@ -22,8 +30,12 @@ app.post("/command", (req, res) => {
   }
 
   const key = `${user}:${device}`;
-  commandQueue[key] = { command };
+  if (!commandQueue[key]) {
+    commandQueue[key] = { commands: [] };
+  }
+  commandQueue[key].commands.push(command);
   console.log(`✅ Queued command for ${key}:`, command);
+  console.log('Current command queue:', commandQueue);
   res.json({ success: true });
 });
 
@@ -35,10 +47,22 @@ app.get("/poll", (req, res) => {
   }
 
   const key = `${user}:${device}`;
-  const response = commandQueue[key] || { command: null };
-  delete commandQueue[key]; // Clear after sending
+  let response = { command: null };
 
-  console.log(`📡 Polled by ${key} →`, response.command);
+  if (commandQueue[key] && commandQueue[key].commands.length > 0) {
+    // Get the next command from the queue
+    const nextCommand = commandQueue[key].commands.shift();
+    response = { command: nextCommand };
+    console.log(`📡 Polled by ${key} → Sending command:`, nextCommand);
+    
+    // If no more commands, clean up the queue
+    if (commandQueue[key].commands.length === 0) {
+      delete commandQueue[key];
+    }
+  } else {
+    console.log(`📡 Polled by ${key} → No command pending`);
+  }
+  
   res.json(response);
 });
 
@@ -47,9 +71,6 @@ app.get("/poll", (req, res) => {
 // Configure multer for handling audio files
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.json());
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GeminiApiKey);

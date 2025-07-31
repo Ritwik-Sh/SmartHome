@@ -290,8 +290,7 @@ async function processMessage(message, isVoiceInput = false) {
         // Process any commands in the response
         if (window.processAIResponse) {
             window.processAIResponse(data.response);
-
-        }
+        } else {console.error("processAIResponse is not defined")}
         if (isVoiceInput) {
             // Remove commands from speech response
             const speechText = data.response.replace(/{Command:.*?}}/g, '').trim();
