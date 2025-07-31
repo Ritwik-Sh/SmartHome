@@ -1,6 +1,6 @@
 async function executeCommand(device, action) {
   try {
-    const res = await fetch('https://your-backend.onrender.com/command', {
+    const res = await fetch('https://localhost:3000/command', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user: 'ritwik', device, command: `${device.toUpperCase()}_${action.toUpperCase()}` })
