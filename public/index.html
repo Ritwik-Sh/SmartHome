@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">`
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHome Assistant</title>
+    <script src="https://kit.fontawesome.com/d63d2ac69c.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- <script src="https://js.puter.com/v2/"></script> -->
+    <script></script>
+</head>
+
+<body class="">
+    <header class="h-[16vh] p-3 block mt-0 flex wrap">
+        <h3 id="prompt" class="font-bold w-80 text-blue-500 text-3xl">SmartHome Assistant </h3>
+        <button id="inputToggle" class="bg-none hover:bg-blue-200 inline-block ml-auto items-end rounded-full h-20 w-20">
+            <span class="fa-regular fa-keyboard fa-2x text-blue-400"></span></button>
+    </header>
+    <main class="w-screen h-[72vh] relative flex justify-center">
+        <div id="chatContainer"
+            class="px-[10vw] chat-container overflow-y-auto p-4 fixed left-0 right-0 top-[16vh] bottom-[20vh]"></div>
+        <h1 id="mainText" class="ease-in w-[80vw] text-6xl font-bold text-blue-200 text-center absolute bottom-[6vh] p-2 z-10">
+            Welcome</h1>
+    </main>
+    <footer class="bottom-0 fixed w-full justify-center flex">
+        <button class="rounded-full bg-blue-100/80 border-blue-100 border-4 text-blue-800 h-24 w-24 fixed left-auto bottom-5" id="micButton">
+            <span class="fas fa-microphone fa-2x"></span>
+        </button>
+        <input id="chatInput" type="text" placeholder="Type your message here..."
+            class="hidden ease-in rounded-xl p-2 w-[80vw] mb-8 left-auto text-center self-center flex bg-blue-100/80 border-blue-100 border-4">
+    </footer>
+    <div class="ocean">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+    <style>
+        /* waves */
+        .ocean {
+            --waveHeight: 30vh;
+            height: var(--waveHeight);
+            /* change the height of the waves here */
+            width: 100vw;
+            position: fixed !important;
+            /* top: auto; */
+            bottom: 0;
+            left: 0;
+            right: 0;
+            overflow-x: hidden;
+            z-index: -10;
+        }
+
+        .wave {
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%23003F7C'/%3E%3C/svg%3E");
+            position: absolute;
+            width: 400%;
+            height: 100%;
+            animation: wave 12s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+            transform: translate3d(0, 0, 0);
+            opacity: 0.8;
+            background-repeat: repeat-x;
+            bottom: 0;
+        }
+
+        .wave:nth-of-type(2) {
+            bottom: 0;
+            animation: wave 18s cubic-bezier(0.36, 0.45, 0.63, 0.53) -5s infinite;
+            opacity: 0.5;
+        }
+
+        .wave:nth-of-type(3) {
+            bottom: 0;
+            animation: wave 24s cubic-bezier(0.36, 0.45, 0.63, 0.53) -2s infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+    <script src="commands.js"></script>
+    <script src="script.js"></script>
+    <script src="ai.js"></script>
+</body>
+
+</html>
