@@ -19,7 +19,7 @@ async function executeCommand(device, action) {
 
     console.log('Sending command:', payload);
 
-    const res = await fetch('http://localhost:3000/command', {
+    const res = await fetch('/command', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
