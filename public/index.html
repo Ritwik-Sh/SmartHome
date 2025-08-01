@@ -8,23 +8,34 @@
     <script src="https://kit.fontawesome.com/d63d2ac69c.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- <script src="https://js.puter.com/v2/"></script> -->
-    <script></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if ('chrome' in window || (navigator.userAgent.indexOf('Chrome') > -1 && navigator.vendor === 'Google Inc.')) {
+                document.body.style.backgroundColor = 'darkblue';
+            }
+        })
+    </script>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="">
     <header class="h-[16vh] p-3 block mt-0 flex wrap">
         <h3 id="prompt" class="font-bold w-80 text-blue-500 text-3xl">SmartHome Assistant </h3>
-        <button id="inputToggle" class="bg-none hover:bg-blue-200 inline-block ml-auto items-end rounded-full h-20 w-20">
+        <button id="inputToggle"
+            class="bg-none hover:bg-blue-200 inline-block ml-auto items-end rounded-full h-20 w-20">
             <span class="fa-regular fa-keyboard fa-2x text-blue-400"></span></button>
     </header>
     <main class="w-screen h-[72vh] relative flex justify-center">
         <div id="chatContainer"
             class="px-[10vw] chat-container overflow-y-auto p-4 fixed left-0 right-0 top-[16vh] bottom-[20vh]"></div>
-        <h1 id="mainText" class="ease-in w-[80vw] text-6xl font-bold text-blue-200 text-center absolute bottom-[6vh] p-2 z-10">
+        <h1 id="mainText"
+            class="ease-in w-[80vw] text-6xl font-bold text-blue-200 text-center absolute bottom-[6vh] p-2 z-10">
             Welcome</h1>
     </main>
     <footer class="bottom-0 fixed w-full justify-center flex">
-        <button class="rounded-full bg-blue-100/80 border-blue-100 border-4 text-blue-800 h-24 w-24 fixed left-auto bottom-5" id="micButton">
+        <button
+            class="rounded-full bg-blue-100/80 border-blue-100 border-4 text-blue-800 h-24 w-24 fixed left-auto bottom-5"
+            id="micButton">
             <span class="fas fa-microphone fa-2x"></span>
         </button>
         <input id="chatInput" type="text" placeholder="Type your message here..."

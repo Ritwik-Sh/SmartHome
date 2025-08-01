@@ -281,12 +281,11 @@ async function processMessage(message, isVoiceInput = false) {
 
         chatHistory.push({ role: 'assistant', content: response });
 
-        // Keep history limited to last 10 messages
-        if (chatHistory.length > 10) {
-            chatHistory = chatHistory.slice(-10);
+        if (chatHistory.length > 20) {
+            chatHistory = chatHistory.slice(-20);
         }
 
-        mainText.textContent = data.response;
+        
         // Process any commands in the response
         if (window.processAIResponse) {
             window.processAIResponse(data.response);
@@ -298,6 +297,8 @@ async function processMessage(message, isVoiceInput = false) {
                 speakResponse(speechText);
             }
         }
+        mainText.innerHTML = data.response.replace(/{Command:.*?}}/g, match => `<code>${match}</code><br>`).trim();
+
     } catch (error) {
         console.error('Error:', error);
         mainText.textContent = 'Error communicating with AI';
