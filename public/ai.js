@@ -158,13 +158,15 @@ async function toggleRecording() {
             isRecording = true;
             updateMicButtonState();
             mainText.textContent = 'Listening (using fallback system)...';
-
         }
     }
 }
 
 // Update microphone button appearance
 function updateMicButtonState() {
+    const micButton = document.querySelector('#micButton');
+    if (!micButton) return;
+    
     const micIcon = micButton.querySelector('span');
     if (isRecording) {
         micIcon.style.color = '#ff0000';
@@ -175,59 +177,60 @@ function updateMicButtonState() {
     }
 }
 
-var index=0;
-// Add message to chat history
-function addMessageToChat(message) {
-    // TODO: Add This
-    if (index > 0) {
+var messageIndex = 0;
+
+// Add message to chat history - FIXED VERSION
+function addMessageToChat(message, isUser = true) {
+    // Add AI response first if there's a pending one and this is a user message
+    if (isUser && temp && messageIndex > 0) {
         const AIMessageDiv = document.createElement('div');
         const AIBubble = document.createElement('div');
-        AIMessageDiv.className = `mb-4 text-left`;
-        AIBubble.className = `inline-block rounded-lg p-3 max-w-[70%] bg-blue-500 text-white`;
-        AIBubble.textContent = temp;
-
+        AIMessageDiv.className = 'mb-4 text-left';
+        AIBubble.className = 'inline-block rounded-lg p-3 max-w-[70%] bg-blue-500 text-white';
+        
+        // Clean the response and format commands
+        const cleanedResponse = temp.replace(/{Command:.*?}}/g, match => `<code class="bg-blue-700 px-1 rounded">${match}</code>`);
+        AIBubble.innerHTML = cleanedResponse;
+        
         AIBubble.style.transition = 'all 0.3s ease';
-
         AIMessageDiv.appendChild(AIBubble);
         chatContainer.appendChild(AIMessageDiv);
+        
+        // Clear temp after displaying
+        temp = '';
     }
 
-    index++;
-    const userMessageDiv = document.createElement('div');
-    const userBubble = document.createElement('div');
-    // if (!isUser) {
-    //     console.log(mainText.textContent);
-    userMessageDiv.className = `mb-4 text-right`;
-    userBubble.className = `inline-block rounded-lg p-3 max-w-[70%] bg-gray-200 text-black`;
-    userBubble.textContent = message;
-
-    userBubble.style.transition = 'all 1s ease';
-
-    //     if (index==0) bubble.className = `hidden`
+    // Add user message
+    if (isUser) {
+        messageIndex++;
+        const userMessageDiv = document.createElement('div');
+        const userBubble = document.createElement('div');
+        userMessageDiv.className = 'mb-4 text-right';
+        userBubble.className = 'inline-block rounded-lg p-3 max-w-[70%] bg-gray-200 text-black';
+        userBubble.textContent = message;
+        userBubble.style.transition = 'all 0.3s ease';
+        
+        userMessageDiv.appendChild(userBubble);
+        chatContainer.appendChild(userMessageDiv);
+    }
     
-    // } else {
-    //     messageDiv.className = `mb-4 ${isUser ? 'text-right' : 'text-left'}`;
-    //     bubble.className = `inline-block rounded-lg p-3 max-w-[70%] ${isUser ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`;
-    //     bubble.textContent = message;
-    // }
-    userMessageDiv.appendChild(userBubble);
-    chatContainer.appendChild(userMessageDiv);
+    // Scroll to bottom
     chatContainer.scrollTop = chatContainer.scrollHeight;
-
 }
 
-// Process message using Puter AI
+// Process message using Puter AI - FIXED VERSION
 async function processMessage(message, isVoiceInput = false) {
     if (!message.trim()) return;
 
     try {
         // Add user message to chat
-        addMessageToChat(message);
+        addMessageToChat(message, true);
         chatHistory.push({ role: 'user', content: message });
 
         // Prepare context with chat history
         var prompt = `
-            There are a list of commands that the user can mean for controlling a device, the list of the devices, with options for their states are as follows.\n
+            There are a list of commands that the user can mean for controlling a device, the list of the devices, with options for their states are as follows.
+
             [
                 {
                     "device": "kitchenLight",
@@ -236,8 +239,7 @@ async function processMessage(message, isVoiceInput = false) {
                 {
                     "device": "livingRoomLight",
                     "options": ["on", "off"]
-                }
-
+                },
                 {
                     "device": "door",
                     "options": ["lock", "unlock", "open", "close"]
@@ -258,15 +260,18 @@ async function processMessage(message, isVoiceInput = false) {
             User: "Tell me 2+2, and if the answer is even, turn off the kitchen lights."
             AI: "Two + Two is Four. {Command: {Device:kitchenLight, Action:off}}"
 
-            Keep the response short, concise, and relevent.
-            You arent just controlling these devices, you can talk with the user too, if he asks a suitable question or gives an appropriate prompt where he wants something like that.
-            \n
+            Keep the response short, concise, and relevant.
+            You aren't just controlling these devices, you can talk with the user too, if he asks a suitable question or gives an appropriate prompt where he wants something like that.
+            
         `;
+        
         const contextPrompt = chatHistory.map(msg =>
             `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`
         ).join('\n') + '\nAssistant:';
         prompt += contextPrompt;
+        
         mainText.textContent = 'Thinking...';
+        
         const response = await fetch('/chat', {
             method: 'POST',
             headers: {
@@ -277,19 +282,26 @@ async function processMessage(message, isVoiceInput = false) {
         
         const data = await response.json();
         if (data.error) throw new Error(data.error);
+        
+        // Store AI response - FIXED: Store the actual response content
         temp = data.response;
 
-        chatHistory.push({ role: 'assistant', content: response });
+        // FIXED: Add assistant response to chat history with correct content
+        chatHistory.push({ role: 'assistant', content: data.response });
 
+        // Keep chat history manageable
         if (chatHistory.length > 20) {
             chatHistory = chatHistory.slice(-20);
         }
 
-        
         // Process any commands in the response
         if (window.processAIResponse) {
             window.processAIResponse(data.response);
-        } else {console.error("processAIResponse is not defined")}
+        } else {
+            console.error("processAIResponse is not defined");
+        }
+        
+        // Handle voice output
         if (isVoiceInput) {
             // Remove commands from speech response
             const speechText = data.response.replace(/{Command:.*?}}/g, '').trim();
@@ -297,11 +309,18 @@ async function processMessage(message, isVoiceInput = false) {
                 speakResponse(speechText);
             }
         }
-        mainText.innerHTML = data.response.replace(/{Command:.*?}}/g, match => `<code>${match}</code><br>`).trim();
+        
+        // Update main text display with formatted response
+        const formattedResponse = data.response.replace(/{Command:.*?}}/g, match => 
+            `<code class="bg-gray-200 px-2 py-1 rounded text-sm">${match}</code>`
+        );
+        mainText.innerHTML = formattedResponse;
 
     } catch (error) {
         console.error('Error:', error);
         mainText.textContent = 'Error communicating with AI';
+        // Also add error to chat
+        temp = 'Sorry, I encountered an error processing your request.';
     }
 }
 
@@ -378,6 +397,6 @@ micButton.addEventListener('touchcancel', (e) => {
 });
 
 // Show appropriate button state based on speech support
-if (!hasNativeSpeech) {
+if (!hasNativeSpeech && micButton) {
     micButton.classList.replace('text-blue-800', 'text-yellow-500');
 }
