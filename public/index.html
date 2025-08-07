@@ -7,7 +7,6 @@
     <title>SmartHome Assistant</title>
     <script src="https://kit.fontawesome.com/d63d2ac69c.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- <script src="https://js.puter.com/v2/"></script> -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if ('chrome' in window || (navigator.userAgent.indexOf('Chrome') > -1 && navigator.vendor === 'Google Inc.')) {
@@ -19,8 +18,9 @@
 </head>
 
 <body class="">
-    <header class="h-[16vh] p-3 block mt-0 flex wrap">
-        <h3 id="prompt" class="font-bold w-80 text-blue-500 text-3xl">SmartHome Assistant </h3>
+    <header class="h-[16vh] p-3 block mt-0 flex">
+        <span id="esp-status-indicator" class="fa-solid fa-circle m-[2vw] mt-[1.5vh]"></span>
+        <h3 class="font-bold w-80 text-blue-500 text-3xl">SmartHome Assistant</h3>
         <button id="inputToggle"
             class="bg-none hover:bg-blue-200 inline-block ml-auto items-end rounded-full h-20 w-20">
             <span class="fa-regular fa-keyboard fa-2x text-blue-400"></span></button>
@@ -90,7 +90,6 @@
             0% {
                 transform: translateX(0);
             }
-
             100% {
                 transform: translateX(-50%);
             }

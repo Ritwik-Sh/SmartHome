@@ -39,9 +39,12 @@ app.post("/command", (req, res) => {
   res.json({ success: true });
 });
 
+lastPollTime = 0;
 // GET /poll?user=ritwik&device=esp32 - ESP32 polls here
 app.get("/poll", (req, res) => {
+  lastPollTime = Date.now();
   const { user, device } = req.query;
+  isPolling = true;
   if (!user || !device) {
     return res.status(400).json({ error: "Missing user or device" });
   }
@@ -66,6 +69,13 @@ app.get("/poll", (req, res) => {
   res.json(response);
 });
 
+// Is ESP Online (is it polling? Wait before changing status = 2000 ms)
+app.get("/status", (req, res) => {
+  if (lastPollTime < Date.now() - 2000) {
+    return res.json({ online: false });
+  }
+  res.json({ online: true });
+});
 
 
 // Configure multer for handling audio files

@@ -1,8 +1,5 @@
 async function executeCommand(device, action) {
   try {
-    // Map device names to their ESP32 command format
-    
-    // Get the ESP32 format of the device name or use the original
     const espDevice = device;
     
     // Prepare the command payload
@@ -55,6 +52,25 @@ function processAIResponse(response) {
     executeCommand(device, action);
   }
 }
+
+const indicator = document.querySelector('#esp-status-indicator');
+setInterval(async () => {
+  try {
+    const res = await fetch('/status');
+    const data = await res.json();
+    console.log('ESP Status:', data);
+    
+    if (data.online) {
+      indicator.classList.remove('text-red-600');
+      indicator.classList.add('text-emerald-500');
+    } else {
+      indicator.classList.remove('text-emerald-500');
+      indicator.classList.add('text-red-600');
+    }
+  } catch (err) {
+    console.error('Error checking ESP status:', err);
+  }
+}, 3000);
 
 // Make processAIResponse available globally
 window.processAIResponse = processAIResponse;
