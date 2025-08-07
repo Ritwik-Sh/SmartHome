@@ -1,14 +1,9 @@
 async function executeCommand(device, action) {
   try {
     // Map device names to their ESP32 command format
-    const commandMap = {
-      'kitchenLight': 'KITCHEN_LIGHT',
-      'livingRoomLight': 'LIVING_ROOM_LIGHT',
-      'door': 'DOOR'
-    };
     
     // Get the ESP32 format of the device name or use the original
-    const espDevice = commandMap[device] || device.toUpperCase();
+    const espDevice = device;
     
     // Prepare the command payload
     const payload = {

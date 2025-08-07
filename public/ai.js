@@ -241,8 +241,12 @@ async function processMessage(message, isVoiceInput = false) {
                     "options": ["on", "off"]
                 },
                 {
-                    "device": "door",
-                    "options": ["lock", "unlock", "open", "close"]
+                    "device": "bedroomLight",
+                    "options": ["on", "off"]
+                },
+                {
+                    "device": "washroomLight",
+                    "options": ["on", "off"]
                 }
             ]
             
@@ -255,7 +259,7 @@ async function processMessage(message, isVoiceInput = false) {
             AI: "{Command: {Device:livingRoomLight, Action:off}}"
 
             User: "Turn off all the lights"
-            AI: "{Command: {Device:kitchenLight, Action:off}}{Command: {Device:livingRoomLight, Action:off}}"
+            AI: "{Command: {Device:kitchenLight, Action:off}}{Command: {Device:livingRoomLight, Action:off}}{Command: {Device:bedroomLight, Action:off}}{Command: {Device:washroomLight, Action:off}}"
 
             User: "Tell me 2+2, and if the answer is even, turn off the kitchen lights."
             AI: "Two + Two is Four. {Command: {Device:kitchenLight, Action:off}}"
